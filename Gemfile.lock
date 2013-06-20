@@ -1,0 +1,16 @@
+PATH
+  remote: .
+  specs:
+    sql2avro (0.1.0)
+      yajl-ruby
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    yajl-ruby (1.1.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  sql2avro!
