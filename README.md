@@ -1,6 +1,6 @@
 # sql2avro
 
-sql2avro extracts data from a SQL database table then transforms it into an [](Avro) file with schema based on the database table's. The target use case is incremental loading of data from an SQL database into [https://hadoop.apache.org/](HDFS) for analysis via [https://hadoop.apache.org/](Hadoop).
+sql2avro extracts data from a SQL database table then transforms it into an [https://avro.apache.org/](Avro) file with schema based on the database table's. The target use case is incremental loading of data from an SQL database into [https://hadoop.apache.org/](HDFS) for analysis via [https://hadoop.apache.org/](Hadoop).
 
 ## Installation
 
