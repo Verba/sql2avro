@@ -37,7 +37,7 @@ For details, see [http://www.michael-noll.com/blog/2013/03/17/reading-and-writin
 
 ## License
 
-Copyright 2013 [http://www.verbasoftware.com/](Verba, Inc.)
+Copyright 2013 Verba, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this software except in compliance with the License.
