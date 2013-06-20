@@ -1,16 +1,52 @@
-Tried to bake https://github.com/miyucy/snappy into Avro Ruby bindings,
-but the compressed data was not readable by avro-tools jar; this was the
-commit I based my work on:
-https://github.com/apache/avro/commit/1e7a16eb1d624fd10b5b7676ade9a37b77234bb5.
+# sql2avro
 
-NOTE: on OSX the version of Snappy baked into Avro tools 1.7.4 has
+sql2avro extracts data from a specified SQL database table and transforms it into an Avro file with a schema based on the database table's schema. The intended use case is to incrementally load data out of an SQL database and into HDFS for analysis via Hadoop.
+
+## Installation
+
+    gem install sql2avro
+
+## Usage
+
+    require 'sql2avro'
+
+    config = {
+      host:     "localhost",
+      username: "myuser",
+      password: "mypass",
+      database: "somedatabase"
+    }
+    min_id = 0
+    output = Sql2Avro.avroize(config, 'table', min_id)
+
+    error_message = output[:error]
+    if !error_message.nil?
+      p error_message
+    else
+      p "Successfully saved rows [#{min_id}, #{output[:max_id]}] to #{output[:path]}."
+    end
+
+## Gotchas
+
+On OSX, the version of Snappy baked into Avro tools 1.7.4 has
 trouble with JVM 7, so temporarily switch to JVM 6 using
 
-    export JAVA_HOME=`/usr/libexec/java_home -v '1.6*'`
+    $ export JAVA_HOME=`/usr/libexec/java_home -v '1.6*'`
 
-Useful links:
+For details, see [http://www.michael-noll.com/blog/2013/03/17/reading-and-writing-avro-files-from-the-command-line/#known-issues-of-snappy-with-jdk-7-on-mac-os-x](here).
 
-  - http://www.michael-noll.com/blog/2013/03/17/reading-and-writing-avro-files-from-the-command-line/#known-issues-of-snappy-with-jdk-7-on-mac-os-x
-  - http://www.igvita.com/2010/02/16/data-serialization-rpc-with-avro-ruby/
-  - http://stackoverflow.com/a/13595102/1486325
+## License
+
+Copyright 2013 [http://www.verbasoftware.com/](Verba, Inc.)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this software except in compliance with the License.
+You may obtain a copy of the License in LICENSE.txt in this repository,
+copied from http://www.apache.org/licenses/LICENSE-2.0.
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
