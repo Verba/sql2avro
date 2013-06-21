@@ -2,7 +2,7 @@ Gem::Specification.new do |spec|
   spec.name        = 'sql2avro'
   spec.summary     = "Tool for pulling data from SQL database tables into Avro files."
   spec.description = "sql2avro extracts data from a specified SQL database table and transforms it into an Avro file with a schema based on the database table's schema. The intended use case is to incrementally load data out of an SQL database and into HDFS for analysis via Hadoop."
-  spec.version     = "0.3.1"
+  spec.version     = "0.3.2"
   spec.authors     = ['Mason Simon']
   spec.email       = ['mason@verbasoftware.com']
 
