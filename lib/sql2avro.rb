@@ -61,7 +61,7 @@ module Sql2Avro
       cmd = "java -jar #{AVRO_TOOLS_PATH} fromjson --codec snappy --schema '#{schema}' #{json_file} > #{filename}"
       `#{cmd}`
 
-      #`rm #{json_file}`
+      `rm #{json_file}`
     rescue Exception => e
       retval[:error] = "#{e}\n\n#{e.backtrace}"
     end
