@@ -151,8 +151,8 @@ class MySql < DbInterface
         #{db_name}
     }
 
-    Open3.popen3(cmd) do |stdin, stdout, stderr|
-      while (line = stdout.gets)
+    Open3.popen3(cmd) do |i, o, e|
+      while (line = o.gets)
         block.call(line.chop.split(MYSQL_BATCH_SEP))
       end
     end

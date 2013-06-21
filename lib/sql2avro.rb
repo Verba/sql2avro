@@ -4,7 +4,7 @@ require 'yajl'
 require_relative 'interface/mysql'
 
 module Sql2Avro
-  AVRO_TOOLS_PATH = File.expand_path('../vendor/avro-tools-1.7.4.jar', __FILE__)
+  AVRO_TOOLS_PATH = File.expand_path('../../vendor/avro-tools-1.7.4.jar', __FILE__)
 
 
   # Pulls data from the given database table starting from the given id.
@@ -45,16 +45,20 @@ module Sql2Avro
     }
 
     begin
-      Open3.popen3("java -jar #{AVRO_TOOLS_PATH} fromjson --codec snappy --schema '#{schema}' /dev/stdin > #{filename}") do |stdin, stdout, stderr, wait_thr|
-        $stdout = stdout
-
+      json_file = "#{filename}.json"
+      File.open(json_file, 'w') do |f|
         interface.data(table, min_id, max_id).each do |datum|
-          Yajl::Encoder.encode(datum, stdin)
-          stdin.write "\n"
+          Yajl::Encoder.encode(datum, f)
+          f.write "\n"
         end
       end
+
+      cmd = "java -jar #{AVRO_TOOLS_PATH} fromjson --codec snappy --schema '#{schema}' #{json_file} > #{filename}"
+      `#{cmd}`
+
+      `rm #{json_file}`
     rescue
-      retval[:error] = $!
+      retval[:error] = $!.to_s
     end
 
     retval
