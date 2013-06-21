@@ -143,7 +143,7 @@ class MySql < DbInterface
     cmd = %{
       mysql \\
         --batch \\
-        --execute="#{sql}" \\
+        --execute="SET NAMES 'utf8'; #{sql}" \\
         --host #{db_host} \\
         --user #{username} \\
         --password=#{password} \\
