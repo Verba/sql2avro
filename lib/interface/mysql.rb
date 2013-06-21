@@ -148,9 +148,13 @@ class MySql < DbInterface
         #{db_name}
     }
 
-    Open3.popen3(cmd) do |i, o, e|
+    Open3.popen3(cmd) do |i, o, e, wait_thr|
       while (line = o.gets)
         block.call(line.chop.split(MYSQL_BATCH_SEP))
+      end
+
+      if !wait_thr.value.success?
+        raise "Error querying mysql\n\nQuery: #{cmd}\nSTDERR: #{e.read}\nSTATUS: #{wait_thr.value}"
       end
     end
   end

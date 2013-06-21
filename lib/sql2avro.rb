@@ -29,7 +29,7 @@ module Sql2Avro
   # min_id specifies the value of the id column from which to start.
   def Sql2Avro.avroize(database_config, table, min_id, max_rows_per_batch=nil)
     raise "Database interface not specified." if !database_config.has_key? 'adapter'
-    raise "Database interface not supported: #{database_config['adapter']}" if database_config['adapter'] != 'mysql'
+    raise "Database interface not supported: #{database_config['adapter']}" unless ['mysql', 'mysql2'].include? database_config['adapter']
 
     interface = MySql.new(database_config)
 
@@ -50,6 +50,9 @@ module Sql2Avro
     }
 
     begin
+      prev_default_internal = Encoding.default_internal
+      Encoding.default_internal = nil
+
       json_file = "#{filename}.json"
       File.open(json_file, 'w') do |f|
         interface.data(table, min_id, max_id_this_batch) do |datum|
@@ -58,10 +61,18 @@ module Sql2Avro
         end
       end
 
+      Encoding.default_internal = prev_default_internal
+
       cmd = "java -jar #{AVRO_TOOLS_PATH} fromjson --codec snappy --schema '#{schema}' #{json_file} > #{filename}"
       `#{cmd}`
+      if !$?.success?
+        raise "Error converting JSON to Avro.\n\nCommand: #{cmd}\nStatus: #{$?}"
+      end
 
       `rm #{json_file}`
+      if !$?.success?
+        raise "Error deleting temporary JSON file #{json_file}"
+      end
     rescue Exception => e
       retval[:error] = "#{e}\n\n#{e.backtrace}"
     end
