@@ -47,7 +47,7 @@ class MySql < DbInterface
     end
   end
 
-  def data(table, min_id, max_id)
+  def data(table, min_id, max_id, &block)
     columns = nil
     rows = []
 
@@ -100,11 +100,8 @@ class MySql < DbInterface
         end
       end
 
-      rows << row
+      block.call(row)
     end
-
-    # TODO: stream this data out rather than return all in one batch.
-    rows
   end
 
   def sql_schema(table)

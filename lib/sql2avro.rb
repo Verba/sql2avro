@@ -52,7 +52,7 @@ module Sql2Avro
     begin
       json_file = "#{filename}.json"
       File.open(json_file, 'w') do |f|
-        interface.data(table, min_id, max_id_this_batch).each do |datum|
+        interface.data(table, min_id, max_id_this_batch) do |datum|
           Yajl::Encoder.encode(datum, f)
           f.write "\n"
         end
@@ -61,7 +61,7 @@ module Sql2Avro
       cmd = "java -jar #{AVRO_TOOLS_PATH} fromjson --codec snappy --schema '#{schema}' #{json_file} > #{filename}"
       `#{cmd}`
 
-      `rm #{json_file}`
+      #`rm #{json_file}`
     rescue Exception => e
       retval[:error] = "#{e}\n\n#{e.backtrace}"
     end
