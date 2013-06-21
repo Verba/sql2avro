@@ -27,7 +27,7 @@ module Sql2Avro
   # table is the table to pull from.
   #
   # min_id specifies the value of the id column from which to start.
-  def Sql2Avro.avroize(database_config, table, min_id)
+  def Sql2Avro.avroize(database_config, table, min_id, max_rows_per_batch=nil)
     raise "Database interface not specified." if !database_config.has_key? 'adapter'
     raise "Database interface not supported: #{database_config['adapter']}" if database_config['adapter'] != 'mysql'
 
@@ -35,19 +35,24 @@ module Sql2Avro
 
     schema = Yajl::Encoder.encode(interface.schema(table))
     max_id = interface.max_id(table)
+    max_id_this_batch = if max_rows_per_batch.nil?
+      max_id
+    else
+      [max_id, min_id + max_rows_per_batch].min
+    end
 
     date, time, zone = Time.now.utc.to_s.split
-    filename = "#{table}.#{date}T#{time}Z.#{min_id}.#{max_id}.avro"
+    filename = "#{table}.#{date}T#{time}Z.#{min_id}.#{max_id_this_batch}.avro"
 
     retval = {
-      max_id: max_id,
+      max_id: max_id_this_batch,
       path: filename
     }
 
     begin
       json_file = "#{filename}.json"
       File.open(json_file, 'w') do |f|
-        interface.data(table, min_id, max_id).each do |datum|
+        interface.data(table, min_id, max_id_this_batch).each do |datum|
           Yajl::Encoder.encode(datum, f)
           f.write "\n"
         end
@@ -57,8 +62,8 @@ module Sql2Avro
       `#{cmd}`
 
       `rm #{json_file}`
-    rescue
-      retval[:error] = $!.to_s
+    rescue Exception => e
+      retval[:error] = "#{e}\n\n#{e.backtrace}"
     end
 
     retval

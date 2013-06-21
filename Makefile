@@ -1,4 +1,4 @@
-sql2avro-0.1.1.gem: sql2avro.gemspec
+sql2avro-*.gem: sql2avro.gemspec
 	bundle exec gem build $<
 
 vendor/avro-tools-1.7.4.jar:
