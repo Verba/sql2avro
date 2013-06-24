@@ -46,7 +46,7 @@ module Sql2Avro
 
     retval = {
       max_id: max_id_this_batch,
-      path: filename
+      path: File.join(directory, filename)
     }
 
     begin

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    sql2avro (0.3.2)
+    sql2avro (0.4.1)
       yajl-ruby
 
 GEM
