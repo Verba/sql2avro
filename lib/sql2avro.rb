@@ -27,7 +27,7 @@ module Sql2Avro
   # table is the table to pull from.
   #
   # min_id specifies the value of the id column from which to start.
-  def Sql2Avro.avroize(database_config, table, min_id, max_rows_per_batch=nil)
+  def Sql2Avro.avroize(database_config, table, min_id, max_rows_per_batch=nil, directory='/tmp')
     raise "Database interface not specified." if !database_config.has_key? 'adapter'
     raise "Database interface not supported: #{database_config['adapter']}" unless ['mysql', 'mysql2'].include? database_config['adapter']
 
@@ -53,7 +53,7 @@ module Sql2Avro
       prev_default_internal = Encoding.default_internal
       Encoding.default_internal = nil
 
-      json_file = "#{filename}.json"
+      json_file = File.join(directory, "#{filename}.json")
       File.open(json_file, 'w') do |f|
         interface.data(table, min_id, max_id_this_batch) do |datum|
           Yajl::Encoder.encode(datum, f)
@@ -63,7 +63,7 @@ module Sql2Avro
 
       Encoding.default_internal = prev_default_internal
 
-      cmd = "java -jar #{AVRO_TOOLS_PATH} fromjson --codec snappy --schema '#{schema}' #{json_file} > #{filename}"
+      cmd = "java -jar #{AVRO_TOOLS_PATH} fromjson --codec snappy --schema '#{schema}' #{json_file} > #{File.join(directory, filename)}"
       `#{cmd}`
       if !$?.success?
         raise "Error converting JSON to Avro.\n\nCommand: #{cmd}\nStatus: #{$?}"
