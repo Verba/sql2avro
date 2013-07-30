@@ -49,32 +49,28 @@ module Sql2Avro
       path: File.join(directory, filename)
     }
 
-    begin
-      prev_default_internal = Encoding.default_internal
-      Encoding.default_internal = nil
+    prev_default_internal = Encoding.default_internal
+    Encoding.default_internal = nil
 
-      json_file = File.join(directory, "#{filename}.json")
-      File.open(json_file, 'w') do |f|
-        interface.data(table, min_id, max_id_this_batch) do |datum|
-          Yajl::Encoder.encode(datum, f)
-          f.write "\n"
-        end
+    json_file = File.join(directory, "#{filename}.json")
+    File.open(json_file, 'w') do |f|
+      interface.data(table, min_id, max_id_this_batch) do |datum|
+        Yajl::Encoder.encode(datum, f)
+        f.write "\n"
       end
+    end
 
-      Encoding.default_internal = prev_default_internal
+    Encoding.default_internal = prev_default_internal
 
-      cmd = "java -jar #{AVRO_TOOLS_PATH} fromjson --codec snappy --schema '#{schema}' #{json_file} > #{File.join(directory, filename)}"
-      `#{cmd}`
-      if !$?.success?
-        raise "Error converting JSON to Avro.\n\nCommand: #{cmd}\nStatus: #{$?}"
-      end
+    cmd = "java -jar #{AVRO_TOOLS_PATH} fromjson --codec snappy --schema '#{schema}' #{json_file} > #{File.join(directory, filename)}"
+    `#{cmd}`
+    if !$?.success?
+      raise "Error converting JSON to Avro.\n\nCommand: #{cmd}\nStatus: #{$?}"
+    end
 
-      `rm #{json_file}`
-      if !$?.success?
-        raise "Error deleting temporary JSON file #{json_file}"
-      end
-    rescue Exception => e
-      retval[:error] = "#{e}\n\n#{e.backtrace}"
+    `rm #{json_file}`
+    if !$?.success?
+      raise "Error deleting temporary JSON file #{json_file}"
     end
 
     retval
