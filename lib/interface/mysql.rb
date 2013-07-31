@@ -167,10 +167,10 @@ class MySql < DbInterface
     # See https://dev.mysql.com/doc/refman/5.0/en/numeric-type-overview.html
     when /tinyint\(1\)/, /bool/, /boolean/
       'boolean'
-    when /tinyint/, /smallint/, /mediumint/, /integer/, /int/
-      'int'
     when /bigint/, /serial/
       'long'
+    when /tinyint/, /smallint/, /mediumint/, /integer/, /int/
+      'int'
     when /decimal/, /dec/
       'string'
     when /float/
